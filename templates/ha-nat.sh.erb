@@ -168,10 +168,7 @@ INSTANCE_ID=$(get_instance_id)
 
 trap process_KILL SIGKILL
 while [ true ]; do
-    # Only run on elected leader of NAT instances, otherwise we just stop
-    consul-do "${NUBIS_PROJECT}/${NUBIS_ENVIRONMENT}/nat-leader" "${INSTANCE_ID}"
-    rv=$?
-    if [ ${rv} -ne 0 ]; then
+    if [ ${CONSUL_LOCK_HELD} == 'true' ]; then
         log "Leader change detected, changing routes"
         configure_routes
         log "Leader change detected, associated new eip"
